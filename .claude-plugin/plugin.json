@@ -1,0 +1,13 @@
+{
+  "name": "easylabs-skills",
+  "description": "Skills for Claude Code from Easy Labs — decision quality, premortems, and other techniques worth keeping in muscle memory",
+  "version": "0.1.0",
+  "author": {
+    "name": "Andrew Fisher",
+    "email": "andrew.fisher@itseasy.co"
+  },
+  "homepage": "https://github.com/itseasyco/easylabs-skills",
+  "repository": "https://github.com/itseasyco/easylabs-skills",
+  "license": "MIT",
+  "keywords": ["skills", "premortem", "decision-quality", "claude-code", "easy-labs"]
+}
