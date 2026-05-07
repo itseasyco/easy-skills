@@ -1,13 +1,13 @@
 {
-  "name": "easylabs-skills-dev",
-  "description": "Self-hosted marketplace for the easylabs-skills plugin",
+  "name": "easy-skills-dev",
+  "description": "Self-hosted marketplace for the easy-skills plugin",
   "owner": {
     "name": "Andrew Fisher",
     "email": "andrew.fisher@itseasy.co"
   },
   "plugins": [
     {
-      "name": "easylabs-skills",
+      "name": "easy-skills",
       "description": "Skills for Claude Code from Easy Labs — decision quality, premortems, and other techniques worth keeping in muscle memory",
       "version": "0.1.0",
       "source": "./",

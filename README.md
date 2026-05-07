@@ -1,4 +1,4 @@
-# easylabs-skills
+# easy-skills
 
 Skills for [Claude Code](https://claude.com/claude-code) from [Easy Labs](https://itseasy.co) — decision-quality techniques worth keeping in muscle memory.
 
@@ -18,17 +18,17 @@ Two paths — pick whichever your tool supports.
 
 ```bash
 # Install all skills, globally (user-level)
-npx skills add itseasyco/easylabs-skills -g -y
+npx skills add itseasyco/easy-skills -g -y
 
 # Or install a specific skill
-npx skills add itseasyco/easylabs-skills --skill premortem -g -y
+npx skills add itseasyco/easy-skills --skill premortem -g -y
 ```
 
 ### Claude Code plugin marketplace
 
 ```text
-/plugin marketplace add itseasyco/easylabs-skills
-/plugin install easylabs-skills
+/plugin marketplace add itseasyco/easy-skills
+/plugin install easy-skills
 ```
 
 Both paths install the same skills from the same repo. Use whichever fits your workflow.
@@ -50,12 +50,12 @@ Each skill's `SKILL.md` documents its trigger phrases, the procedure it follows,
 npx skills update -g
 
 # Claude Code plugin
-/plugin update easylabs-skills
+/plugin update easy-skills
 ```
 
 ## Contributing / feedback
 
-Issues and PRs welcome at [github.com/itseasyco/easylabs-skills](https://github.com/itseasyco/easylabs-skills).
+Issues and PRs welcome at [github.com/itseasyco/easy-skills](https://github.com/itseasyco/easy-skills).
 
 ## License
 
