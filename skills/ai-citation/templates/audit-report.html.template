@@ -1,0 +1,486 @@
+<!--
+  AI Citation Audit Report Template
+  Placeholders are wrapped in {{double_braces}}. The skill substitutes them at render time.
+  Style is intelligence-brief: dark mode, Montserrat/Inter/JetBrains Mono, premortem-derived palette.
+  Self-contained — no external assets except Google Fonts (graceful fallback).
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Citation Audit — {{brand_full_name}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0a0e1a;
+  --surface:   #11162a;
+  --surface-2: #161c34;
+  --fg:        #e8ecf5;
+  --fg-muted:  rgba(232,236,245,0.66);
+  --fg-dim:    rgba(232,236,245,0.42);
+  --border:    rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.16);
+  --signal:    #02d79d;
+  --warn:      #f6b94c;
+  --alert:     #ff5f5b;
+  --crit:      #ff3a6e;
+  --c-chatgpt:    #02d79d;
+  --c-perplexity: #5cd1ff;
+  --c-aio:        #ffd166;
+  --c-gemini:     #c97cf5;
+  --c-claude:     #ff5f5b;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.wrapper {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 56px 32px 96px;
+  position: relative;
+  isolation: isolate;
+}
+.wrapper::before, .wrapper::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+  z-index: -1;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  filter: blur(120px);
+}
+.wrapper::before {
+  top: -200px; left: -200px;
+  background: radial-gradient(circle, rgba(2,215,157,0.10) 0%, transparent 70%);
+}
+.wrapper::after {
+  bottom: -200px; right: -200px;
+  background: radial-gradient(circle, rgba(255,95,91,0.10) 0%, transparent 70%);
+}
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--fg-dim);
+  margin: 0 0 12px;
+}
+.eyebrow.accent { color: var(--signal); }
+.eyebrow.warn { color: var(--warn); }
+.eyebrow.alert { color: var(--alert); }
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 42px;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 8px;
+}
+h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  margin: 56px 0 18px;
+}
+h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  margin: 24px 0 10px;
+}
+p { margin: 0 0 12px; color: var(--fg-muted); }
+.meta {
+  display: flex; flex-wrap: wrap; gap: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--fg-dim);
+  margin-top: 16px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.meta strong { color: var(--fg); font-weight: 600; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 26px;
+  margin-bottom: 20px;
+}
+.score-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 32px;
+  align-items: center;
+  padding: 36px 32px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  margin: 32px 0;
+}
+.score-big {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 96px;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--signal), var(--c-perplexity));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.score-big.warn  { background: linear-gradient(135deg, var(--warn), var(--alert));
+                   -webkit-background-clip: text; background-clip: text;
+                   -webkit-text-fill-color: transparent; }
+.score-big.alert { background: linear-gradient(135deg, var(--alert), var(--crit));
+                   -webkit-background-clip: text; background-clip: text;
+                   -webkit-text-fill-color: transparent; }
+.score-out-of { font-size: 28px; color: var(--fg-dim); margin-left: 6px; }
+.score-breakdown { display: flex; gap: 32px; margin-top: 12px; }
+.score-mini-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--fg-dim);
+}
+.score-mini-value {
+  font-family: 'Montserrat', sans-serif; font-weight: 600;
+  font-size: 28px; letter-spacing: -0.02em; color: var(--fg);
+}
+.factor-row {
+  display: grid;
+  grid-template-columns: 1fr auto 200px;
+  gap: 16px; align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.factor-row:last-child { border: none; }
+.factor-name { color: var(--fg); font-weight: 500; }
+.factor-weight {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--fg-dim);
+}
+.bar {
+  background: rgba(255,255,255,0.04);
+  height: 8px; border-radius: 4px; overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: var(--signal);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+.bar-fill.warn { background: var(--warn); }
+.bar-fill.alert { background: var(--alert); }
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 20px 0 8px;
+}
+.platform-tile {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
+  border-left: 4px solid var(--c-chatgpt);
+}
+.platform-tile[data-engine="perplexity"] { border-left-color: var(--c-perplexity); }
+.platform-tile[data-engine="aio"]        { border-left-color: var(--c-aio); }
+.platform-tile[data-engine="gemini"]     { border-left-color: var(--c-gemini); }
+.platform-tile[data-engine="claude"]     { border-left-color: var(--c-claude); }
+.platform-tile h4 {
+  font-family: 'Montserrat', sans-serif; font-weight: 600;
+  font-size: 13px; margin: 0 0 8px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.platform-tile .v {
+  font-family: 'Montserrat', sans-serif; font-weight: 700;
+  font-size: 32px; letter-spacing: -0.02em; line-height: 1;
+}
+.platform-tile .measured {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--signal); margin-top: 6px;
+}
+.bsam-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px; margin-top: 8px;
+}
+.bsam-cell {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+  text-align: center;
+}
+.bsam-cell .platform {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--fg-dim); margin-bottom: 6px;
+}
+.bsam-cell .score {
+  font-family: 'Montserrat', sans-serif; font-weight: 700;
+  font-size: 28px; letter-spacing: -0.02em;
+}
+.bsam-cell.score-0  .score { color: var(--alert); }
+.bsam-cell.score-5  .score { color: var(--warn); }
+.bsam-cell.score-10 .score { color: var(--signal); }
+ul.findings { list-style: none; padding: 0; margin: 0; }
+ul.findings li {
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--signal);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+ul.findings.gaps li { border-left-color: var(--alert); }
+ul.findings .impact {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--fg-dim); margin-left: 8px;
+}
+.actions-table {
+  width: 100%; border-collapse: collapse; font-size: 14px;
+}
+.actions-table th, .actions-table td {
+  text-align: left; padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.actions-table th {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--fg-dim); font-weight: 500;
+}
+.actions-table .bucket {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  padding: 2px 8px; border-radius: 3px; display: inline-block;
+}
+.actions-table .bucket.week    { background: rgba(2,215,157,0.15); color: var(--signal); }
+.actions-table .bucket.month   { background: rgba(246,185,76,0.15); color: var(--warn); }
+.actions-table .bucket.quarter { background: rgba(201,124,245,0.15); color: var(--c-gemini); }
+.warning-callout {
+  border: 1px solid var(--warn);
+  background: rgba(246,185,76,0.06);
+  border-radius: 8px;
+  padding: 22px 26px;
+}
+.warning-callout h3 { margin-top: 0; color: var(--warn); }
+.transparency {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--fg-dim);
+  padding: 16px 18px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 6px;
+  margin: 16px 0;
+}
+footer {
+  margin-top: 80px; padding-top: 32px;
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--fg-dim);
+  letter-spacing: 0.04em;
+}
+footer a { color: var(--signal); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <p class="eyebrow accent">AI Citation Audit — Baseline</p>
+  <h1>{{brand_full_name}}</h1>
+  <p style="font-size: 18px; color: var(--fg-muted); margin-top: 4px;">{{category_description}}</p>
+  <div class="meta">
+    <span><strong>URL</strong> {{root_url}}</span>
+    <span><strong>Audited</strong> {{audit_date}}</span>
+    <span><strong>Pages scanned</strong> {{pages_audited}}</span>
+    <span><strong>Next review</strong> {{next_review_date}}</span>
+  </div>
+
+  <div class="score-hero">
+    <div>
+      <p class="eyebrow">Composite Citation Score</p>
+      <div>
+        <span class="score-big {{composite_severity}}">{{composite_score}}</span><span class="score-out-of">/100</span>
+      </div>
+      <div class="score-breakdown">
+        <div>
+          <div class="score-mini-label">Readiness</div>
+          <div class="score-mini-value">{{readiness_score}}/100</div>
+        </div>
+        <div>
+          <div class="score-mini-label">Action</div>
+          <div class="score-mini-value">{{action_score}}/100</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="eyebrow">Executive Summary</p>
+      <p style="color: var(--fg); font-size: 16px;">{{executive_summary_3_sentences}}</p>
+    </div>
+  </div>
+
+  <h2>Per-Platform Snapshot</h2>
+  <p>Projected citation likelihood per engine, based on factor mix. Engines with ✓ measured used live API probing.</p>
+  <div class="platform-grid">
+    <div class="platform-tile" data-engine="chatgpt">
+      <h4>ChatGPT</h4>
+      <div class="v">{{chatgpt_projection}}</div>
+      {{#if chatgpt_measured}}<div class="measured">✓ Measured {{chatgpt_measured_rate}}%</div>{{/if}}
+    </div>
+    <div class="platform-tile" data-engine="perplexity">
+      <h4>Perplexity</h4>
+      <div class="v">{{perplexity_projection}}</div>
+      {{#if perplexity_measured}}<div class="measured">✓ Measured {{perplexity_measured_rate}}%</div>{{/if}}
+    </div>
+    <div class="platform-tile" data-engine="aio">
+      <h4>Google AIO</h4>
+      <div class="v">{{aio_projection}}</div>
+    </div>
+    <div class="platform-tile" data-engine="gemini">
+      <h4>Gemini</h4>
+      <div class="v">{{gemini_projection}}</div>
+    </div>
+    <div class="platform-tile" data-engine="claude">
+      <h4>Claude</h4>
+      <div class="v">{{claude_projection}}</div>
+    </div>
+  </div>
+
+  <h2>Score Breakdown — Readiness</h2>
+  <div class="card">
+    {{#each readiness_factors}}
+    <div class="factor-row">
+      <span class="factor-name">{{factor_name}}</span>
+      <span class="factor-weight">w {{weight}}</span>
+      <div class="bar"><div class="bar-fill {{severity}}" style="width: {{score_pct}}%"></div></div>
+    </div>
+    {{/each}}
+  </div>
+
+  <h2>Score Breakdown — Action</h2>
+  <div class="card">
+    {{#each action_factors}}
+    <div class="factor-row">
+      <span class="factor-name">{{factor_name}}</span>
+      <span class="factor-weight">w {{weight}}</span>
+      <div class="bar"><div class="bar-fill {{severity}}" style="width: {{score_pct}}%"></div></div>
+    </div>
+    {{/each}}
+  </div>
+
+  <h2>Brand Surface Area Map</h2>
+  <p>Off-site presence on the platforms AI engines actually pull from.</p>
+  <div class="bsam-grid">
+    {{#each bsam_platforms}}
+    <div class="bsam-cell score-{{score}}">
+      <div class="platform">{{platform_name}}</div>
+      <div class="score">{{score}}/10</div>
+    </div>
+    {{/each}}
+  </div>
+
+  <div class="transparency">
+    {{off_site_probe_transparency_note}}
+  </div>
+
+  <h2>Top Wins</h2>
+  <ul class="findings">
+    {{#each top_wins}}
+    <li><strong>{{title}}</strong> — {{description}}<span class="impact">{{impact_note}}</span></li>
+    {{/each}}
+  </ul>
+
+  <h2>Top Gaps</h2>
+  <ul class="findings gaps">
+    {{#each top_gaps}}
+    <li><strong>{{title}}</strong> — {{description}}<span class="impact">+{{impact_pts}} pts possible</span></li>
+    {{/each}}
+  </ul>
+
+  <h2>Prioritized 30/60/90-Day Action Plan</h2>
+  <table class="actions-table">
+    <thead>
+      <tr>
+        <th>When</th>
+        <th>Move</th>
+        <th>Tag</th>
+        <th>Impact</th>
+        <th>Effort</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each prioritized_actions}}
+      <tr>
+        <td><span class="bucket {{bucket}}">{{bucket_label}}</span></td>
+        <td>{{move_title}}</td>
+        <td><code>{{tag}}</code></td>
+        <td>+{{impact}} pts</td>
+        <td>{{effort}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <h2>Per-Page Detail</h2>
+  <table class="actions-table">
+    <thead>
+      <tr>
+        <th>URL</th>
+        <th>Blocks</th>
+        <th>Blocks ≥70</th>
+        <th>Passage Score</th>
+        <th>Freshness</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each per_page}}
+      <tr>
+        <td><code>{{url}}</code></td>
+        <td>{{block_count}}</td>
+        <td>{{blocks_passing_70}}</td>
+        <td>{{passage_score}}/100</td>
+        <td>{{freshness_days}}d</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <h2>⚠ Don't Waste Time On</h2>
+  <div class="warning-callout">
+    <h3>These are popular but low-impact (or counter-productive)</h3>
+    <ul style="margin: 0; padding-left: 18px; color: var(--fg-muted);">
+      <li><strong>llms.txt</strong> — Cyrus Shepard's 54-experiment analysis scored this 2.0/10. Mention in your robots.txt sitemap reference at most; do not invest team time.</li>
+      <li><strong>Schema sprays without entity discipline</strong> — Adding schema to every page without proper required-field hygiene hurts your Schema Completeness score (validity gaps).</li>
+      <li><strong>Aggressive WAF bot-blocking</strong> — Many sites accidentally block <code>Google-Extended</code> and <code>OAI-SearchBot</code> via Cloudflare/AWS WAF default rules. Audit your bot-management rules.</li>
+      <li><strong>The "blank-page-with-schema-only" hack</strong> — Works short-term, ages poorly, ethics-debt accrues. Apply the sanitized version (rich schema on <em>real</em> content).</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>
+      Methodology: AI Citation Readiness factors derived from Cyrus Shepard's
+      <a href="https://signal.zyppy.com/p/ai-citation-ranking-factors">May 2026 analysis</a> of 54 AI citation experiments.
+      Action factors derived from Princeton/Georgia Tech/IIT Delhi GEO research (2024).
+      Freshness thresholds from SE Ranking (2026). Platform-specific citation shares from Discovered Labs early-2026 data.
+    </p>
+    <p>
+      Snapshot: <code>{{snapshot_path}}</code> · Schema v{{schema_version}} · Methodology v{{methodology_version}}<br>
+      To run the next check: <code>/ai-citation delta {{site_slug}}</code>
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

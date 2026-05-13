@@ -1,0 +1,61 @@
+# Next AI Citation Review — {{brand_full_name}}
+
+**Baseline composite score:** {{composite_score}}/100 (Readiness {{readiness_score}} · Action {{action_score}})
+**Baseline run date:** {{audit_date}}
+**Next review due:** {{next_review_date}} *(in {{days_until_review}} days)*
+**Reminder channel set up:** {{reminder_channel}}
+**Snapshot path:** `{{snapshot_path}}`
+
+---
+
+## To run the next check
+
+When the review date comes up, run:
+
+```
+/ai-citation delta {{site_slug}}
+```
+
+The skill will load this baseline, run a fresh audit, compute deltas, auto-close any recommendations its detectors can verify, and produce a delta report at `{{storage_path}}/{{next_review_date}}-delta-report.html`.
+
+---
+
+## Manual calendar add (fallback if reminder channel didn't take)
+
+**Google Calendar:**
+[Add to Google Calendar]({{gcal_add_url}})
+
+**Outlook:**
+[Add to Outlook]({{outlook_add_url}})
+
+**Apple Calendar / .ics:**
+A calendar invite file is in this snapshot folder: `next-review.ics` *(if generated)*
+
+---
+
+## Open recommendations carrying forward
+
+These moves were either skipped or surfaced as gaps during the baseline audit. The delta run will re-measure each one:
+
+{{#each open_recommendations}}
+- [ ] **{{move_title}}** — +{{impact}} pts est. · effort: {{effort}} · tag: `{{tag}}`
+{{/each}}
+
+---
+
+## What this reminder cannot guarantee
+
+This file is the audit trail and a copy-paste reminder. It cannot make the review happen — that requires you (or a teammate) to run the slash command on or after **{{next_review_date}}**.
+
+If the discipline isn't there, install the `schedule` skill and enroll this site for autonomous monthly delta runs:
+
+```
+/ai-citation delta {{site_slug}} --enroll-cron
+```
+
+That option only works if the schedule skill is installed in your environment.
+
+---
+
+**Last walkthrough plan:** `{{walkthrough_plan_path}}`
+**Schema v{{schema_version}} · Methodology v{{methodology_version}}**

@@ -8,8 +8,8 @@
   "plugins": [
     {
       "name": "easy-skills",
-      "description": "Skills for Claude Code from Easy Labs — decision quality, premortems, and other techniques worth keeping in muscle memory",
-      "version": "0.1.0",
+      "description": "Skills for Claude Code from Easy Labs — decision quality, premortems, AI citation optimization, and other techniques worth keeping in muscle memory",
+      "version": "0.2.0",
       "source": "./",
       "author": {
         "name": "Andrew Fisher",

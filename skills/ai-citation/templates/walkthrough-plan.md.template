@@ -1,0 +1,74 @@
+# AI Citation Growth Plan — {{brand_full_name}}
+
+**Audit date:** {{audit_date}}
+**Composite score:** {{composite_score}}/100 → projected {{projected_score}}/100 after these moves
+**Target engine:** {{target_engine}}
+
+---
+
+## Brand identity
+
+- **Primary name:** {{brand_primary}}
+- **Full name:** {{brand_full_name}}
+- **Category:** {{category_description}}
+- **Domain:** {{root_url}}
+
+---
+
+## Selected moves
+
+The skill picked the top {{move_count}} moves by (impact × ease) for this site. Status reflects walkthrough choices and (where applicable) auto-close detection on the most recent delta run.
+
+{{#each moves}}
+### {{move_number}}. {{move_title}}
+
+**Status:** {{status_icon}} **{{status_label}}** {{#if last_verified}}*(last verified {{last_verified}})*{{/if}}
+
+| Impact | Effort | Tag |
+|---|---|---|
+| +{{impact}} pts | {{effort}} | `{{tag}}` |
+
+**Why this move:** {{why_sentence}}
+
+{{#if status_is_done}}
+**Evidence:** {{evidence_url_or_note}}
+{{/if}}
+
+{{#if status_is_skipped}}
+**Skip reason:** {{skip_reason}}
+**Skip scope:** {{skip_scope}} *(this run only / this site permanently)*
+{{/if}}
+
+{{#if has_playbook}}
+#### Playbook
+
+{{playbook_block}}
+
+{{#if linear_issue_url}}
+**Tracking ticket:** [{{linear_issue_title}}]({{linear_issue_url}})
+{{/if}}
+{{/if}}
+
+---
+{{/each}}
+
+## Verification after next audit
+
+When you run `/ai-citation delta {{site_slug}}`, the delta engine will auto-detect closure for:
+
+{{#each auto_closable_moves}}
+- [ ] **{{move_title}}** — detector: {{detector_description}}
+{{/each}}
+
+For moves without auto-close detection, you'll be prompted to mark status manually during the next walkthrough.
+
+---
+
+## Notes from this walkthrough run
+
+{{walkthrough_freeform_notes}}
+
+---
+
+**Snapshot:** `{{snapshot_path}}`
+**Next review due:** {{next_review_date}}

@@ -7,6 +7,7 @@ Skills for [Claude Code](https://claude.com/claude-code) from [Easy Labs](https:
 | Skill | What it does |
 |---|---|
 | [premortem](skills/premortem/) | Imagines your plan has already failed and works backward to identify why. Generates parallel deep-dives per failure mode, then synthesizes a revised plan + pre-launch checklist as a self-contained "intelligence brief" HTML report. Triggers on phrases like `premortem this`, `what could kill this`, `stress test this plan`. |
+| [ai-citation](skills/ai-citation/) | Audits a brand's likelihood of being cited by AI search engines (ChatGPT, Perplexity, Claude, Gemini, Google AI Overviews), walks the team through prioritized growth-hack moves to fix gaps, and tracks improvements over monthly delta runs. Produces a Composite AI Citation Score (Readiness + Action), Brand Surface Area Map, and per-engine projections. Triggers on phrases like `audit our AI citation`, `GEO audit`, `get cited by ChatGPT`, `raise our AI citation score`. |
 
 More skills land here as we build them.
 

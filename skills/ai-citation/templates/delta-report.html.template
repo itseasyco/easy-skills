@@ -1,0 +1,234 @@
+<!--
+  AI Citation Delta Report Template
+  Same structural shell as audit-report.html.template, with before/after panels.
+  See audit-report.html.template for the base CSS and layout conventions.
+  This template adds: composite delta banner, wins/regressions/still-open sections.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Citation Delta — {{brand_full_name}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Inherits the same palette + typography as audit-report.html.template.
+   Render-time copy the entire <style> block from audit-report.html.template here,
+   then append the delta-specific additions below. */
+
+/* === BEGIN: copy the full :root + body + .wrapper + .eyebrow + h1/h2/h3 +
+   .meta + .card + .score-hero + .platform-grid + .bsam-grid + ul.findings +
+   .actions-table + .warning-callout + .transparency + footer styles from
+   audit-report.html.template === */
+
+/* === DELTA-SPECIFIC ADDITIONS === */
+
+.delta-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28px 32px;
+  border-radius: 10px;
+  margin: 24px 0;
+  border: 1px solid var(--border-strong);
+}
+.delta-banner.improved { background: linear-gradient(90deg, rgba(2,215,157,0.18), rgba(2,215,157,0.04)); border-color: var(--signal); }
+.delta-banner.regressed { background: linear-gradient(90deg, rgba(255,95,91,0.18), rgba(255,95,91,0.04)); border-color: var(--alert); }
+.delta-banner.flat { background: var(--surface); }
+.delta-banner .delta-arrow {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 56px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.delta-banner.improved .delta-arrow { color: var(--signal); }
+.delta-banner.regressed .delta-arrow { color: var(--alert); }
+.delta-banner.flat .delta-arrow { color: var(--fg-dim); }
+
+.before-after {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 20px 0;
+}
+.before-after .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.20em;
+  color: var(--fg-dim);
+}
+.before-after .value {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 36px;
+  letter-spacing: -0.03em;
+}
+.before-after .arrow {
+  color: var(--fg-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+.status-pill.closed    { background: rgba(2,215,157,0.20);  color: var(--signal); }
+.status-pill.partial   { background: rgba(246,185,76,0.20); color: var(--warn); }
+.status-pill.open      { background: rgba(255,255,255,0.06); color: var(--fg-muted); }
+.status-pill.regressed { background: rgba(255,58,110,0.20); color: var(--crit); }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <p class="eyebrow accent">AI Citation Delta Report</p>
+  <h1>{{brand_full_name}}</h1>
+  <p style="font-size: 18px; color: var(--fg-muted);">{{category_description}}</p>
+  <div class="meta">
+    <span><strong>URL</strong> {{root_url}}</span>
+    <span><strong>Comparing</strong> {{baseline_date}} → {{delta_date}}</span>
+    <span><strong>Days elapsed</strong> {{days_elapsed}}</span>
+    <span><strong>Next review</strong> {{next_review_date}}</span>
+  </div>
+
+  <div class="delta-banner {{delta_direction}}">
+    <div>
+      <p class="eyebrow">Composite Citation Score · {{delta_direction_label}}</p>
+      <div class="before-after">
+        <div>
+          <div class="label">Baseline</div>
+          <div class="value" style="color: var(--fg-muted);">{{baseline_composite}}</div>
+        </div>
+        <div class="arrow">→</div>
+        <div>
+          <div class="label">Current</div>
+          <div class="value">{{current_composite}}</div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align: right;">
+      <div class="delta-arrow">{{delta_sign}}{{delta_pts}}</div>
+      <p class="eyebrow" style="margin-top: 8px;">{{delta_pts_label}}</p>
+    </div>
+  </div>
+
+  <h2>Score Breakdown — Before/After</h2>
+  <div class="card">
+    {{#each factor_deltas}}
+    <div class="factor-row">
+      <span class="factor-name">
+        {{factor_name}}
+        {{#if is_mover}}<span class="status-pill {{mover_direction}}">{{mover_label}}</span>{{/if}}
+      </span>
+      <span class="factor-weight">{{baseline_score}} → {{current_score}}</span>
+      <div class="bar"><div class="bar-fill {{severity}}" style="width: {{current_score_pct}}%"></div></div>
+    </div>
+    {{/each}}
+  </div>
+
+  <h2>✓ Wins (auto-closed since baseline)</h2>
+  {{#if wins.length}}
+  <ul class="findings">
+    {{#each wins}}
+    <li>
+      <strong>{{move_title}}</strong> <span class="status-pill closed">closed</span><br>
+      <span style="color: var(--fg-muted);">{{description}}</span>
+      <span class="impact">+{{realized_pts}} pts realized</span>
+    </li>
+    {{/each}}
+  </ul>
+  {{else}}
+  <p style="color: var(--fg-muted);">No recommendations auto-closed since baseline. Run the walkthrough to confirm what's been done manually.</p>
+  {{/if}}
+
+  <h2>⚠ Regressions</h2>
+  {{#if regressions.length}}
+  <ul class="findings gaps">
+    {{#each regressions}}
+    <li>
+      <strong>{{title}}</strong> <span class="status-pill regressed">regressed</span><br>
+      <span style="color: var(--fg-muted);">{{description}}</span>
+      <span class="impact">{{delta_pts}} pts</span>
+    </li>
+    {{/each}}
+  </ul>
+  {{else}}
+  <p style="color: var(--fg-muted);">No regressions detected since baseline. 👍</p>
+  {{/if}}
+
+  <h2>Still Open (carried forward)</h2>
+  <table class="actions-table">
+    <thead>
+      <tr>
+        <th>Move</th>
+        <th>Status</th>
+        <th>Impact</th>
+        <th>Tag</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each still_open}}
+      <tr>
+        <td>{{move_title}}</td>
+        <td><span class="status-pill {{status}}">{{status}}</span></td>
+        <td>+{{impact}} pts</td>
+        <td><code>{{tag}}</code></td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <h2>New Findings (since baseline)</h2>
+  {{#if new_findings.length}}
+  <ul class="findings gaps">
+    {{#each new_findings}}
+    <li><strong>{{title}}</strong> — {{description}}<span class="impact">+{{impact_pts}} pts possible</span></li>
+    {{/each}}
+  </ul>
+  {{else}}
+  <p style="color: var(--fg-muted);">No new gaps detected.</p>
+  {{/if}}
+
+  <h2>Brand Surface Area Movement</h2>
+  <table class="actions-table">
+    <thead>
+      <tr>
+        <th>Platform</th>
+        <th>Baseline</th>
+        <th>Current</th>
+        <th>Δ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each bsam_deltas}}
+      <tr>
+        <td>{{platform_name}}</td>
+        <td>{{baseline}}/10</td>
+        <td>{{current}}/10</td>
+        <td>{{delta_sign}}{{delta}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <footer>
+    <p>
+      Comparing baseline <code>{{baseline_snapshot}}</code> against current <code>{{delta_snapshot}}</code>.<br>
+      Schema v{{schema_version}} · Methodology v{{methodology_version}}.
+      {{#if methodology_mismatch}}<strong>⚠ Methodology version differs between snapshots — comparison is informational only. Re-baseline recommended.</strong>{{/if}}
+    </p>
+    <p>To run the next check: <code>/ai-citation delta {{site_slug}}</code></p>
+  </footer>
+
+</div>
+</body>
+</html>
