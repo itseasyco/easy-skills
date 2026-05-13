@@ -382,8 +382,10 @@ composite = 0.5 × site_readiness + 0.5 × site_action
 
 | Score | Page-level factors (averaged across priority pages) | Site-level factors (scored once for the whole site) |
 |---|---|---|
-| Readiness | 1, 4, 5, 6, 8, 9, 10, 11, 12 | 3 (brand signal), 7 (robots.txt allow-list) |
+| Readiness | 1, 4, 5, 6, 8, 9, 10, 11 | 2 (search rank — inherently site-level), 3 (brand signal), 7 (robots.txt allow-list), 12 (sitemap + llms.txt) |
 | Action | 1, 3, 4, 6, 7, 8 | 2 (off-site BSAM), 5 (freshness cadence) |
+
+Authoritative source: `rubric/readiness-factors.md` aggregation summary.
 
 Site-level factors are added to the averaged page-level partial via weighted blending so the final score stays normalized to 0-100.
 
@@ -594,7 +596,7 @@ The delta engine doesn't trust "the user said they did it." It re-measures:
 
 - `rewrite-top-3-pages-definition-first`: re-score named pages; if passage_score on those pages went up ≥15 pts → `closed`
 - `add-faq-schema-to-top-10-pages`: re-check JSON-LD; if 10 pages now have FAQPage → `closed`
-- `add-bots-to-robots-allowlist`: re-fetch robots.txt; if all four bots allowed → `closed`
+- `add-bots-to-robots-allowlist`: re-fetch robots.txt; if all five AI bots (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended) now allowed → `closed`
 - `seed-reddit-presence`: re-run off-site probe; if Reddit score moved 0→5 or 5→10 → `closed`
 - Etc.
 
