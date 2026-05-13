@@ -205,7 +205,7 @@ Run each over six off-site platforms via WebSearch:
 
 > "Off-site probe used N query variants and dropped K results that didn't match the category context."
 
-Output: a **Brand Surface Area Map** with mention counts, sentiment signal where visible, gap flags, and "biggest absence" priorities.
+Output: a **Brand Surface Area Map** with mention counts, sentiment signal where visible (decorative — surfaced in the report but NOT factored into the Action Score; see Section 5 BSAM rubric for what is scored), gap flags, and "biggest absence" priorities.
 
 ### Step 5 — Optional live AI citation probing (only if opted in at Q3)
 
@@ -373,12 +373,25 @@ For each page:
   page_action_partial = weighted avg of action factors using block_scores
   page_readiness_partial = weighted avg of readiness factors
 
-site_readiness = avg(page_readiness_partial across priority pages) + site-level factors (3, 7, 8)
+site_readiness = avg(page_readiness_partial across priority pages) + site-level factors (3, 7)
 site_action = avg(page_action_partial) + site-level factors (2, 5)
 composite = 0.5 × site_readiness + 0.5 × site_action
 ```
 
-Priority pages weighted 2× (homepage, top-3 product/feature pages, top-3 highest-traffic content pages if known).
+**Aggregation semantics — which factors are page-level vs site-level:**
+
+| Score | Page-level factors (averaged across priority pages) | Site-level factors (scored once for the whole site) |
+|---|---|---|
+| Readiness | 1, 4, 5, 6, 8, 9, 10, 11, 12 | 3 (brand signal), 7 (robots.txt allow-list) |
+| Action | 1, 3, 4, 6, 7, 8 | 2 (off-site BSAM), 5 (freshness cadence) |
+
+Site-level factors are added to the averaged page-level partial via weighted blending so the final score stays normalized to 0-100.
+
+**Priority pages weighted 2×:** homepage, top-3 product/feature pages, top-3 highest-traffic content pages.
+
+**How "highest-traffic" is determined:**
+- If GSC opted in (Q4 = A) → use actual impressions data
+- Otherwise → fall back to depth-from-homepage as a traffic proxy (shallower = higher priority), with manual override available via `--priority-urls` flag
 
 ### Calibration & honesty
 
@@ -510,6 +523,7 @@ Stable schema across versions for diffing reliability:
 ```json
 {
   "schema_version": "1.0",
+  "methodology_version": "1.0",
   "run": {
     "id": "2026-05-13T14:22:03Z",
     "type": "baseline | delta",
@@ -583,6 +597,8 @@ The delta engine doesn't trust "the user said they did it." It re-measures:
 - `add-bots-to-robots-allowlist`: re-fetch robots.txt; if all four bots allowed → `closed`
 - `seed-reddit-presence`: re-run off-site probe; if Reddit score moved 0→5 or 5→10 → `closed`
 - Etc.
+
+**Default fallback rule:** for any move that does not have an explicit auto-close detector defined, status defaults to `open` and is surfaced in the delta report under "Awaiting manual verification" with a prompt for the user to mark `done` / `partial` / `skipped` during the next walkthrough run. Implementation MUST NOT mark such moves `closed` based on inference.
 
 Status options: `closed | partial | open | regressed`. Walkthrough plan auto-updates with new statuses on each delta run.
 
@@ -691,7 +707,7 @@ The skill is shippable when:
 2. **Ambiguous brand names beyond Easy** — heuristic is "3+ tokens or uncommon proper noun." Real-world failure cases may need an explicit "force disambiguation" flag
 3. **WebFetch rate limits** — 25-page crawl × per-page schema/robots fetches can hit limits; cache aggressively
 4. **Live AI probing cost** — when opted in, API costs accrue; warn user before running with estimate
-5. **Schema-version drift in snapshots** — include `schema_version` from v1; write migration block on first schema change
+5. **Schema-version drift in snapshots** — include `schema_version` (for JSON shape) AND `methodology_version` (for scoring formula / weight changes) from v1; write migration block on first schema change; delta reports MUST refuse to compare across `methodology_version` mismatches and instead recommend the user re-baseline
 6. **Move catalog is opinionated** — the 12 moves reflect May 2026 research; needs periodic refresh as platforms evolve
 
 ---
